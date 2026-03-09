@@ -2,3 +2,6 @@ curl -o result.jpg http://127.0.0.1:3000/200
 curl -X DELETE http://127.0.0.1:3000/200
 curl -i http://127.0.0.1:3000/404
 curl -i -X POST http://127.0.0.1:3000/200
+curl -o cat200.jpg http://127.0.0.1:3000/200
+curl -o cat200.jpg http://127.0.0.1:3000/200
+curl -o cat200.jpg http://127.0.0.1:3000/200
