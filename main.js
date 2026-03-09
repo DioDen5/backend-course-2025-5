@@ -2,6 +2,7 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const { Command } = require("commander");
+const superagent = require("superagent");
 
 const program = new Command();
 
@@ -57,8 +58,20 @@ const server = http.createServer(async (req, res) => {
                 res.writeHead(200, { "Content-Type": "image/jpeg" });
                 return res.end(data);
             } catch {
-                res.writeHead(404, { "Content-Type": "text/plain" });
-                return res.end("Not Found");
+                try {
+                    const response = await superagent
+                        .get(`https://http.cat/${code}`)
+                        .responseType("blob");
+
+                    const imageBuffer = Buffer.from(response.body);
+                    await fs.promises.writeFile(filePath, imageBuffer);
+
+                    res.writeHead(200, { "Content-Type": "image/jpeg" });
+                    return res.end(imageBuffer);
+                } catch {
+                    res.writeHead(404, { "Content-Type": "text/plain" });
+                    return res.end("Not Found");
+                }
             }
         }
 
@@ -83,7 +96,7 @@ const server = http.createServer(async (req, res) => {
         res.writeHead(405, { "Content-Type": "text/plain" });
         res.end("Method Not Allowed");
 
-    } catch (error) {
+    } catch {
         res.writeHead(500, { "Content-Type": "text/plain" });
         res.end("Server Error");
     }
@@ -92,4 +105,3 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, options.host, () => {
     console.log(`Server running at http://${options.host}:${PORT}`);
 });
-
